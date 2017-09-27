@@ -143,6 +143,7 @@ def evaluate_detection_results_pascal_voc(result_lists,
       evaluator.evaluate())
 
   metrics = {'Precision/mAP@{}IOU'.format(iou_thres): mean_ap}
+  print('print Precision/mAP@{0}IOU = {1}'.format(iou_thres, mean_ap))
   category_index = label_map_util.create_category_index(categories)
   for idx in range(per_class_ap.size):
     if idx in category_index:
