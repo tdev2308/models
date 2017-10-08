@@ -27,6 +27,8 @@ from object_detection.utils import label_map_util
 from object_detection.utils import object_detection_evaluation
 from object_detection.utils import visualization_utils as vis_utils
 
+#from azureml.logging import get_azureml_logger
+
 slim = tf.contrib.slim
 
 
@@ -143,7 +145,7 @@ def evaluate_detection_results_pascal_voc(result_lists,
       evaluator.evaluate())
 
   metrics = {'Precision/mAP@{}IOU'.format(iou_thres): mean_ap}
-  print('print Precision/mAP@{0}IOU = {1}'.format(iou_thres, mean_ap))
+  print('print Precision/mAP@{0}IOU = {1}. Eval on {2} images'.format(iou_thres, mean_ap, len(image_ids)))
   category_index = label_map_util.create_category_index(categories)
   for idx in range(per_class_ap.size):
     if idx in category_index:

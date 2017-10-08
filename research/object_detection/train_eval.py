@@ -86,6 +86,8 @@ flags.DEFINE_string('input_config_path', '',
                     'Path to an input_reader_pb2.InputReader config file.')
 flags.DEFINE_string('model_config_path', '',
                     'Path to a model_pb2.DetectionModel config file.')
+flags.DEFINE_integer('eval_every_n_steps', 200,
+                     'How often should evaluation happen.')
 
 # for eval:
 # python object_detection/eval.py  --pipeline_config_path=/../faster_rcnn_resnet101_pets.config
@@ -211,10 +213,10 @@ def main(_):
     is_chief = (task_info.type == 'master')
     master = server.target
 
-  eval_steps = 20
   total_num_steps = train_config.num_steps
-  current_step = eval_steps
+  current_step = FLAGS.eval_every_n_steps
   print("Total number of training steps {}".format(train_config.num_steps))
+  print("Evaluation will run every {} steps".format(FLAGS.eval_every_n_steps))
   train_config.num_steps = current_step
   while current_step <= total_num_steps:
       print("Training steps # {0}".format(current_step))
@@ -224,8 +226,16 @@ def main(_):
       tf.reset_default_graph()
       evaluate_step()
       tf.reset_default_graph()
-      current_step = current_step + eval_steps
+      current_step = current_step + FLAGS.eval_every_n_steps
       train_config.num_steps = current_step
+
+  if current_step > FLAGS.eval_every_n_steps:
+      train_config.num_steps = total_num_steps
+      print("Training steps # {0}".format(train_config.num_steps))
+      trainer.train(create_input_dict_fn, model_fn, train_config, master, task,
+                FLAGS.num_clones, worker_replicas, FLAGS.clone_on_cpu, ps_tasks,
+                worker_job_name, is_chief, FLAGS.train_dir)
+
 
 if __name__ == '__main__':
   tf.app.run()
