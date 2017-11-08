@@ -141,7 +141,7 @@ def get_eval_configs_from_pipeline_file():
 
 
 def evaluate_step():
-    print("Evaluating")
+    tf.logging.info("Evaluating")
     assert FLAGS.eval_dir, '`eval_dir` is missing.'
     model_config, eval_config, input_config = get_eval_configs_from_pipeline_file()
 
@@ -215,11 +215,11 @@ def main(_):
 
   total_num_steps = train_config.num_steps
   current_step = FLAGS.eval_every_n_steps
-  print("Total number of training steps {}".format(train_config.num_steps))
-  print("Evaluation will run every {} steps".format(FLAGS.eval_every_n_steps))
+  tf.logging.info('Total number of training steps %d' % train_config.num_steps)
+  tf.logging.info('Evaluation will run every %d steps' % FLAGS.eval_every_n_steps)
   train_config.num_steps = current_step
   while current_step <= total_num_steps:
-      print("Training steps # {0}".format(current_step))
+      tf.logging.info('Training steps # %d' % current_step)
       trainer.train(create_input_dict_fn, model_fn, train_config, master, task,
                 FLAGS.num_clones, worker_replicas, FLAGS.clone_on_cpu, ps_tasks,
                 worker_job_name, is_chief, FLAGS.train_dir)
@@ -231,7 +231,8 @@ def main(_):
 
   if current_step > FLAGS.eval_every_n_steps:
       train_config.num_steps = total_num_steps
-      print("Training steps # {0}".format(train_config.num_steps))
+      tf.logging.info('Training steps # %d' % train_config.num_steps)
+
       trainer.train(create_input_dict_fn, model_fn, train_config, master, task,
                 FLAGS.num_clones, worker_replicas, FLAGS.clone_on_cpu, ps_tasks,
                 worker_job_name, is_chief, FLAGS.train_dir)
