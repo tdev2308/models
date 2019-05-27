@@ -163,7 +163,7 @@ def evaluate(create_input_dict_fn, create_model_fn, eval_config, categories,
       logging.info('Skipping image')
       counters['skipped'] += 1
       return {}
-    global_step = tf.train.global_step(sess, slim.get_global_step())
+    global_step = tf.train.global_step(sess, tf.train.get_global_step())
     if batch_index < eval_config.num_visualizations:
       tag = 'image-{}'.format(batch_index)
       eval_util.visualize_detection_results(
